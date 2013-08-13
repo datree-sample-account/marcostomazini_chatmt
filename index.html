@@ -1,0 +1,75 @@
+<html>
+<head>
+	<title>Chat MTTech</title>
+	<style>
+		#chat{
+			height:500px;
+		}
+	</style>
+</head>
+<body>
+	<div id="chat"></div>
+	<form id="send-message">
+		<input size="35" id="message"></input>
+		<input type="submit"></input>
+	</form>
+
+	<div id="dialog" title="Digite Seu Nick">
+		<form id="send-nick">
+			<input size="10" id="nickName"></input>
+			<input type="submit"></input>
+		</form>			
+	</div> 
+
+	<script src="//code.jquery.com/jquery-latest.min.js"></script>
+	<script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+	<script src="/socket.io/socket.io.js"></script>
+	<script>	
+		jQuery(function($){
+			var $nickForm = $('#send-nick');
+			var $nickName = $('#nickName');
+
+			$nickForm.submit(function(e){
+				e.preventDefault();
+				$("#dialog").dialog("close");
+			});
+						
+			var socket = io.connect();
+			var $messageForm = $('#send-message');
+			var $messageBox = $('#message');
+			var $chat = $('#chat');
+			
+			$messageForm.submit(function(e){
+				e.preventDefault();
+				socket.emit('send message', ":::" + $('#nickName').val() + "::: " + $messageBox.val());
+				$messageBox.val('');
+			});
+			
+			socket.on('new message', function(data){
+				$chat.append(data + "<br/>");
+			});
+		});
+	</script>
+	
+	<script type="text/javascript">
+$(document).ready(function () {
+    $(function () {
+        $("#dialog").dialog({
+
+            autoOpen: true,
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 1000
+            },
+            hide: {
+                effect: "explode",
+                duration: 1000
+            }
+        });
+    });	
+});
+</script>
+</body>
+</html>
