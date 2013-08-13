@@ -19,8 +19,25 @@ io.configure(function () {
   io.set("transports", ["xhr-polling"]);
   io.set("polling duration", 10);
 });
-
+   
 io.sockets.on('connection', function(socket){
+
+	socket.on('set nickname', function (name) {
+        io.sockets[name] = socket.id;
+    });
+	
+	socket.on("private", function(data) {
+		var idLoc = io.sockets[data.id];
+		var idDest = io.sockets[data.to];
+		
+		if (idDest == undefined)
+		{
+			idDest = "USUARIO NAO EXISTE";
+		}
+		io.sockets.socket(idLoc).emit("private", { from: data.id, to: data.to, msg: data.msg, idLocal: idLoc, idDestino: idDest });		
+		io.sockets.socket(idDest).emit("private", { from: data.id, to: data.to, msg: data.msg, idLocal: idLoc, idDestino: idDest });
+	});
+   
 	socket.on('send message', function(data){
 		io.sockets.emit('new message', data);
 	});
